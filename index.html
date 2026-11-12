@@ -1,0 +1,128 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="description" content="An interactive explainer for GPU architecture, parallel execution, multithreading and data movement across AMD, NVIDIA and Intel GPUs.">
+  <meta name="theme-color" content="#0b1020">
+  <title>GPU Flow Explorer — Inside Parallel Computing</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="#"><span class="brand-mark">G</span><span>GPU FLOW <b>EXPLORER</b></span></a>
+    <nav><a href="#explorer">Explorer</a><a href="#execution">Execution model</a><a href="#glossary">Glossary</a><a href="https://github.com/" target="_blank" rel="noreferrer">GitHub ↗</a></nav>
+  </header>
+  <main>
+    <section class="hero">
+      <div class="eyebrow"><span class="pulse"></span> INTERACTIVE HARDWARE EXPLAINER</div>
+      <h1>Follow the work.<br><span>See the parallelism.</span></h1>
+      <p>Explore how a GPU moves data, schedules groups of threads and executes thousands of operations across AMD, NVIDIA and Intel architectures.</p>
+      <div class="hero-tags"><span>ARCHITECTURE</span><span>THREAD SCHEDULING</span><span>MEMORY HIERARCHY</span></div>
+    </section>
+
+    <section id="explorer" class="panel">
+      <div class="section-heading">
+        <div><div class="eyebrow">01 / ARCHITECTURE EXPLORER</div><h2>Choose a GPU family</h2></div>
+        <span class="status-chip">CONCEPTUAL MODEL</span>
+      </div>
+      <div class="controls">
+        <label>Vendor
+          <select id="vendor">
+            <option value="nvidia">NVIDIA</option><option value="amd">AMD</option><option value="intel">Intel</option>
+          </select>
+        </label>
+        <label>Architecture example
+          <select id="architecture"></select>
+        </label>
+        <label>Workload
+          <select id="workload">
+            <option value="vector">Vector addition</option><option value="matrix">Matrix multiplication</option><option value="graphics">Graphics / raster workload</option><option value="memory">Memory-bound gather</option>
+          </select>
+        </label>
+      </div>
+      <div class="architecture-summary">
+        <div><span class="micro-label">COMPUTE BLOCK</span><strong id="computeName">Streaming Multiprocessor</strong><p id="computeDesc"></p></div>
+        <div><span class="micro-label">EXECUTION GROUP</span><strong id="groupName">Warp</strong><p id="groupDesc"></p></div>
+        <div><span class="micro-label">ON-CHIP DATA</span><strong id="localMemName">Shared memory</strong><p id="localMemDesc"></p></div>
+      </div>
+      <div class="diagram-wrap">
+        <div class="diagram-title"><span>SIMPLIFIED GPU DATA PATH</span><span class="legend"><i class="dot input"></i>Input <i class="dot compute"></i>Compute <i class="dot memory"></i>Memory</span></div>
+        <div class="flow-diagram" id="flowDiagram">
+          <div class="node input-node" data-node="host"><small>HOST</small><b>CPU / System RAM</b><span>Kernel launch + input buffers</span></div>
+          <div class="connector"><span>PCIe / fabric</span><i></i></div>
+          <div class="node memory-node" data-node="vram"><small>DEVICE MEMORY</small><b>VRAM / GDDR / HBM</b><span>Global data + instructions</span></div>
+          <div class="connector"><span>Cache hierarchy</span><i></i></div>
+          <div class="node compute-node" data-node="compute"><small>COMPUTE ARRAY</small><b id="diagramCompute">SM array</b><span>Many independent compute blocks</span></div>
+          <div class="connector"><span>Dispatch groups</span><i></i></div>
+          <div class="node thread-node" data-node="threads"><small>EXECUTION</small><b id="diagramGroup">Warps → lanes</b><span>Issue, execute, retire</span></div>
+          <div class="connector"><span>Results</span><i></i></div>
+          <div class="node output-node" data-node="output"><small>OUTPUT</small><b>Write-back</b><span>Cache / VRAM / host transfer</span></div>
+        </div>
+        <div class="node-detail" id="nodeDetail">Select a block in the diagram to inspect its role in the data path.</div>
+      </div>
+    </section>
+
+    <section id="execution" class="panel">
+      <div class="section-heading">
+        <div><div class="eyebrow">02 / MULTITHREADED EXECUTION</div><h2>Watch a workload get scheduled</h2></div>
+        <span class="status-chip">ILLUSTRATIVE SIMULATION</span>
+      </div>
+      <p class="section-intro">Adjust the number of logical threads and execution blocks. Step through dispatch, execution and memory wait to see why GPUs switch between ready groups instead of leaving compute units idle.</p>
+      <div class="sim-controls">
+        <label>Logical threads <output id="threadCountOut">256</output><input id="threadCount" type="range" min="64" max="1024" step="64" value="256"></label>
+        <label>Compute blocks <output id="blockCountOut">4</output><input id="blockCount" type="range" min="1" max="8" value="4"></label>
+        <label>Memory latency <output id="latencyOut">3 cycles</output><input id="latency" type="range" min="1" max="8" value="3"></label>
+      </div>
+      <div class="sim-actions"><button id="stepBtn" class="primary">Step cycle →</button><button id="runBtn">Run simulation</button><button id="resetBtn">Reset</button><span class="cycle-readout">CYCLE <b id="cycle">0</b></span></div>
+      <div class="sim-layout">
+        <div class="scheduler">
+          <div class="diagram-title">COMPUTE BLOCKS <span class="legend"><i class="dot ready"></i>Ready <i class="dot active"></i>Executing <i class="dot waiting"></i>Memory wait</span></div>
+          <div id="blocks" class="blocks"></div>
+        </div>
+        <aside class="metrics">
+          <div class="metric"><span>Threads completed</span><b id="completed">0 / 256</b></div>
+          <div class="metric"><span>Active groups</span><b id="activeGroups">0</b></div>
+          <div class="metric"><span>Waiting groups</span><b id="waitingGroups">0</b></div>
+          <div class="metric"><span>Estimated utilisation</span><b id="utilisation">0%</b></div>
+          <p class="note">Teaching model only: scheduling and timing are simplified. Real behaviour depends on the GPU generation, compiler, occupancy, register use, memory system and driver.</p>
+        </aside>
+      </div>
+      <div class="timeline"><div class="diagram-title">EVENT LOG <span id="phaseLabel">READY</span></div><ol id="eventLog"><li>Configure a workload, then step or run the simulation.</li></ol></div>
+    </section>
+
+    <section class="panel compare">
+      <div class="section-heading"><div><div class="eyebrow">03 / CROSS-VENDOR LANGUAGE</div><h2>Similar ideas, different names</h2></div></div>
+      <div class="table-scroll"><table><thead><tr><th>Concept</th><th>NVIDIA</th><th>AMD</th><th>Intel</th></tr></thead><tbody>
+        <tr><td>Primary compute block</td><td>Streaming Multiprocessor (SM)</td><td>Compute Unit (CU)</td><td>Xe-core</td></tr>
+        <tr><td>Thread grouping</td><td>Warp (commonly 32 threads)</td><td>Wavefront / wave (size varies by architecture)</td><td>Subgroup / SIMD execution group (varies)</td></tr>
+        <tr><td>Local programmer-managed memory</td><td>Shared memory</td><td>Local Data Share (LDS)</td><td>Shared Local Memory (SLM)</td></tr>
+        <tr><td>Matrix acceleration</td><td>Tensor Cores (supported GPUs)</td><td>Matrix / MFMA units (supported GPUs)</td><td>XMX engines (supported GPUs)</td></tr>
+      </tbody></table></div>
+      <p class="note">Terminology is a conceptual crosswalk, not a claim that these units are identical. Group widths, scheduling and capabilities vary by product and generation.</p>
+    </section>
+
+    <section id="glossary" class="panel glossary">
+      <div class="section-heading"><div><div class="eyebrow">04 / QUICK REFERENCE</div><h2>What to look for</h2></div></div>
+      <div class="glossary-grid">
+        <article><b>Thread</b><p>A logical work item that executes a kernel or shader program.</p></article>
+        <article><b>Warp / wave / subgroup</b><p>A group of lanes scheduled or executed together under a vendor-specific model.</p></article>
+        <article><b>Occupancy</b><p>How many warps or waves can reside on a compute block relative to its hardware limit.</p></article>
+        <article><b>Latency hiding</b><p>Switching to other ready work while one group waits for data or dependencies.</p></article>
+        <article><b>Cache hierarchy</b><p>Fast storage levels that reduce trips to high-latency device memory.</p></article>
+        <article><b>Bandwidth</b><p>The rate at which data can be transferred; distinct from latency.</p></article>
+      </div>
+    </section>
+
+    <section class="sources">
+      <div class="eyebrow">DOCUMENTATION & FURTHER READING</div>
+      <a href="https://docs.nvidia.com/cuda/cuda-c-programming-guide/" target="_blank" rel="noreferrer">NVIDIA CUDA Programming Guide ↗</a>
+      <a href="https://rocm.docs.amd.com/projects/HIP/en/latest/" target="_blank" rel="noreferrer">AMD ROCm / HIP documentation ↗</a>
+      <a href="https://www.intel.com/content/www/us/en/developer/tools/oneapi/overview.html" target="_blank" rel="noreferrer">Intel oneAPI ↗</a>
+      <a href="https://www.intel.com/content/www/us/en/docs/oneapi/programming-guide/current/overview.html" target="_blank" rel="noreferrer">Intel oneAPI Programming Guide ↗</a>
+    </section>
+  </main>
+  <footer>GPU Flow Explorer · Educational visualization · Not a hardware telemetry or reverse-engineering tool</footer>
+  <script src="app.js"></script>
+</body>
+</html>
