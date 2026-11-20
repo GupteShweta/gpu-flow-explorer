@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="description" content="Compare Snapdragon, AMD Ryzen AI and Intel Core Ultra laptop SoCs; simulate CPU, GPU and NPU workload routing; explore ethical lost-PC inventory and recovery.">
+<meta name="theme-color" content="#0b1020">
+<title>SoC Compare & Device Recovery Lab | GPU Flow Explorer</title>
+<link rel="stylesheet" href="../styles.css">
+<link rel="stylesheet" href="update.css">
+</head>
+<body>
+<header class="topbar">
+<a class="brand" href="../"><span class="brand-mark">G</span><span>GPU FLOW <b>EXPLORER</b></span></a>
+<nav><a href="../">GPU Explorer</a><a href="#comparison">SoC compare</a><a href="#simulation">Chipset demo</a><a href="#recovery">Device recovery</a></nav>
+</header>
+<main>
+<section class="update-hero">
+<div class="eyebrow"><span class="pulse"></span> EXTENDED HARDWARE LAB · 2026</div>
+<h1>From silicon to <span>device identity.</span></h1>
+<p>Compare modern laptop system-on-chips, explore how CPU, GPU and NPU resources can share a workload, and practise a responsible lost-device inventory workflow.</p>
+<div class="update-nav"><a href="#comparison">01 · Snapdragon / AMD / Intel</a><a href="#simulation">02 · Chipset simulation</a><a href="#recovery">03 · Lost-PC recovery</a></div>
+</section>
+
+<section id="comparison" class="panel">
+<div class="section-heading"><div><div class="eyebrow">01 / SYSTEM-ON-CHIP COMPARISON</div><h2>Three approaches to an AI PC</h2></div><span class="status-chip">SKU-DEPENDENT SPECS</span></div>
+<div class="controls">
+<label>Highlight a platform
+<select id="socVendor"><option value="snapdragon">Qualcomm Snapdragon X</option><option value="amd">AMD Ryzen AI 300</option><option value="intel">Intel Core Ultra 200V</option></select>
+</label>
+<div class="architecture-summary" style="grid-column:span 2;margin:0">
+<div><span class="micro-label">SELECTED PLATFORM</span><strong id="socName">Snapdragon X Elite / X Plus</strong><p id="socArchitecture">Oryon CPU + Adreno GPU + Hexagon NPU</p></div>
+</div>
+</div>
+<div class="soc-grid" style="margin-top:18px">
+<article class="soc-card"><div class="family">QUALCOMM · ARM-BASED PC SoC</div><h3>Snapdragon X Elite / X Plus</h3><p>Integrated Oryon CPU, Adreno graphics and Hexagon AI engine.</p><dl class="soc-specs"><dt>CPU</dt><dd>Oryon; X Elite has 12 cores, X Plus varies by SKU</dd><dt>GPU</dt><dd>Adreno integrated GPU</dd><dt>NPU</dt><dd>Hexagon, up to 45 TOPS on listed SKUs</dd><dt>Memory</dt><dd>LPDDR5x; X Elite lists up to 135 GB/s</dd></dl></article>
+<article class="soc-card"><div class="family">AMD · X86 LAPTOP SoC</div><h3>Ryzen AI 300 family</h3><p>Zen 5 / Zen 5c CPU, RDNA 3.5 graphics and XDNA 2 AI engine.</p><dl class="soc-specs"><dt>CPU</dt><dd>Up to 12 cores / 24 threads in family configurations</dd><dt>GPU</dt><dd>Radeon 800M-series, RDNA 3.5</dd><dt>NPU</dt><dd>XDNA 2, up to 50 NPU TOPS</dd><dt>Memory</dt><dd>Platform and SKU dependent</dd></dl></article>
+<article class="soc-card"><div class="family">INTEL · X86 LAPTOP SoC</div><h3>Core Ultra 200V family</h3><p>Lunar Lake design with Lion Cove, Skymont, Xe2 graphics and NPU 4.</p><dl class="soc-specs"><dt>CPU</dt><dd>4 P-cores + 4 E-cores in 200V family</dd><dt>GPU</dt><dd>Xe2; up to 8 Xe-cores by SKU</dd><dt>NPU</dt><dd>AI Boost NPU 4, up to 48 TOPS</dd><dt>Memory</dt><dd>On-package LPDDR5X</dd></dl></article>
+</div>
+<div class="chip-visual">
+<div class="diagram-title">CONCEPTUAL CHIPSET BLOCK DIAGRAM <span id="socNote">Select a platform to see its architecture note.</span></div>
+<svg viewBox="0 0 900 330" role="img" aria-label="Conceptual system-on-chip diagram showing CPU, GPU and NPU connected to shared memory and system I/O">
+<rect x="8" y="8" width="884" height="314" rx="18" fill="#0d1829" stroke="#42617e" stroke-width="2"/>
+<text x="30" y="38" fill="#91a8c4" font-size="13" font-family="monospace">SYSTEM-ON-CHIP / SoC PACKAGE</text>
+<rect x="35" y="65" width="245" height="94" rx="10" fill="#202044" stroke="#9d91ff" stroke-width="2"/>
+<text x="55" y="94" fill="#bdb5ff" font-size="12">CPU CLUSTER</text><text id="chipCpuLabel" x="55" y="122" fill="#fff" font-size="15">Qualcomm Oryon CPU</text><text x="55" y="143" fill="#9faec7" font-size="11">OS · application · control flow</text>
+<rect x="327" y="65" width="245" height="94" rx="10" fill="#10303b" stroke="#64d9e8" stroke-width="2"/>
+<text x="347" y="94" fill="#64d9e8" font-size="12">GRAPHICS / PARALLEL ENGINE</text><text id="chipGpuLabel" x="347" y="122" fill="#fff" font-size="15">Qualcomm Adreno GPU</text><text x="347" y="143" fill="#9faec7" font-size="11">graphics · parallel compute</text>
+<rect x="619" y="65" width="245" height="94" rx="10" fill="#3a2b18" stroke="#f5bd68" stroke-width="2"/>
+<text x="639" y="94" fill="#f5bd68" font-size="12">AI ENGINE</text><text id="chipNpuLabel" x="639" y="122" fill="#fff" font-size="15">Qualcomm Hexagon NPU</text><text x="639" y="143" fill="#c5b69d" font-size="11">supported neural workloads</text>
+<path d="M157 159 V205 H450 M450 159 V205 M742 159 V205 H450 V228" stroke="#7b98b7" stroke-width="2" fill="none"/>
+<rect x="240" y="228" width="420" height="62" rx="9" fill="#172b35" stroke="#78e0b2" stroke-width="2"/>
+<text x="450" y="253" text-anchor="middle" fill="#78e0b2" font-size="13">MEMORY + FABRIC + SYSTEM I/O</text><text x="450" y="273" text-anchor="middle" fill="#b4c5d7" font-size="11">Coherent / shared-memory details differ by platform</text>
+</svg>
+<p class="chip-caption">Conceptual functional blocks, not a physical floorplan or die photograph. Actual interconnect, cache, memory controller, media engines and power domains vary by SKU.</p>
+</div>
+<div class="disclaimer"><b>How to read the comparison:</b> TOPS are vendor-reported peak AI throughput figures, not a common benchmark. Precision, sparsity, workload, power limits, software support and memory bandwidth affect real performance. Compare independent workload tests and exact SKU specifications before drawing conclusions.</div>
+</section>
+
+<section id="simulation" class="panel">
+<div class="section-heading"><div><div class="eyebrow">02 / CHIPSET DEMONSTRATION</div><h2>Route a workload across CPU, GPU and NPU</h2></div><span class="status-chip">ILLUSTRATIVE MODEL</span></div>
+<p class="section-intro">Choose a common laptop workload and observe a teaching model of how work may be divided. Actual dispatch depends on the operating system, drivers, application, framework, thermal state and supported operators.</p>
+<div class="simulator-grid">
+<div class="sim-stage">
+<div class="diagram-title">RESOURCE LOAD ESTIMATE <span id="simWorkloadName">On-device AI inference</span></div>
+<div class="route-lanes">
+<div class="route-lane"><h3>CPU</h3><p>Serial logic, orchestration, preprocessing</p><div class="meter"><span id="cpuMeter"></span></div><small id="cpuLoad">0% illustrative load</small></div>
+<div class="route-lane"><h3>GPU</h3><p>Graphics, vector and parallel tensor work</p><div class="meter"><span id="gpuMeter"></span></div><small id="gpuLoad">0% illustrative load</small></div>
+<div class="route-lane"><h3>NPU</h3><p>Supported low-power neural-network operators</p><div class="meter"><span id="npuMeter"></span></div><small id="npuLoad">0% illustrative load</small></div>
+</div>
+<div class="sim-result"><b>Scheduling explanation</b><p id="simExplanation"></p><p>Power profile: <b id="simBudget">Balanced</b></p></div>
+</div>
+<aside class="sim-side">
+<label>Workload<select id="workloadType"><option value="ai">On-device AI inference</option><option value="gaming">3D gaming</option><option value="creator">Video editing and effects</option><option value="office">Office + video call</option></select></label>
+<label>Workload intensity <output id="intensityValue">70%</output><input id="intensity" type="range" min="20" max="100" value="70"></label>
+<label>Power profile<select id="powerMode"><option value="0">Performance-biased</option><option value="1" selected>Balanced</option><option value="2">Efficiency-biased</option></select></label>
+<p class="note">The bars are deterministic illustrative allocations, not measured chip utilisation, frame rates, watts or a benchmark comparison.</p>
+</aside>
+</div>
+</section>
+
+<section id="recovery" class="panel">
+<div class="section-heading"><div><div class="eyebrow">03 / DEVICE IDENTITY & ASSET RECOVERY</div><h2>Find the right PC record — not a CPU “location”</h2></div><span class="status-chip">PRIVACY-FIRST DEMO</span></div>
+<p class="section-intro">A processor name helps describe a computer, but it is not a unique identifier and cannot reveal where a missing PC is. Use a verified asset tag and manufacturer serial number as inventory keys; use an authorised device-location service for location.</p>
+<div class="recovery-grid">
+<div class="recovery-form">
+<h3>Register a device in the demo inventory</h3>
+<div class="form-row"><label>Asset tag *<input id="assetTag" placeholder="e.g. CAMPUS-LT-104"></label><label>Manufacturer serial *<input id="serialNumber" placeholder="Serial from BIOS / OEM"></label></div>
+<div class="form-row"><label>Processor model *<input id="processorName" placeholder="e.g. Intel Core Ultra 7"></label><label>PC model<input id="deviceModel" placeholder="Manufacturer + model"></label></div>
+<div class="recovery-actions"><button class="primary" id="addDevice">Add inventory record</button></div><p id="formFeedback" class="note" aria-live="polite"></p>
+<hr style="border-color:#263650;margin:18px 0">
+<h3>Report a device as missing</h3>
+<label>Exact asset tag or serial<input id="lossTag" placeholder="Enter the registered asset tag or serial"></label>
+<div class="recovery-actions"><button id="markLost">Mark as reported lost</button></div><p id="lossFeedback" class="note" aria-live="polite"></p>
+</div>
+<div class="recovery-results">
+<h3>Session inventory lookup</h3>
+<label>Search asset tag, serial, model or processor<input id="deviceSearch" placeholder="Search the demonstration records"></label>
+<div id="inventoryResults"></div>
+<div class="recovery-note"><b>Demo limitation:</b> records are held only in this page's JavaScript memory. They disappear when the page is reloaded and are never uploaded to a server. Replace this with an access-controlled asset database for real institutional use.</div>
+</div>
+</div>
+<div class="chip-visual" style="margin-top:18px">
+<div class="copy-row"><div><div class="diagram-title">COLLECT LOCAL WINDOWS DEVICE IDENTIFIERS</div><p class="note">Run in PowerShell on a PC you own or administer. The command reads processor, BIOS, enclosure and system-product information.</p></div><button id="copyInventoryCommand">Copy PowerShell</button></div>
+<pre class="code-panel" id="showCommand"></pre><p id="commandFeedback" class="note" aria-live="polite"></p>
+<div class="mini-links"><a href="https://account.microsoft.com/devices" target="_blank" rel="noreferrer">Microsoft devices / Find My Device ↗</a><a href="https://support.microsoft.com/en-us/accounts-billing/security/find-and-lock-a-lost-windows-device" target="_blank" rel="noreferrer">Microsoft lost-device instructions ↗</a></div>
+</div>
+<div class="disclaimer"><b>Responsible recovery:</b> Enable Windows Find My Device before a loss; it requires the feature and location to have been enabled and a supported Microsoft personal-account setup. For managed school or business PCs, use the organisation's authorised MDM/endpoint-management tools. If stolen, preserve purchase and serial-number evidence, contact the police and insurer, and do not attempt to confront or covertly track a suspected holder. A CPU model or processor ID is not proof of ownership.</div>
+</section>
+
+<section class="sources">
+<div class="eyebrow">PRIMARY DOCUMENTATION</div>
+<a href="https://www.qualcomm.com/laptops/products/snapdragon-x-elite" target="_blank" rel="noreferrer">Qualcomm Snapdragon X Elite specifications ↗</a>
+<a href="https://www.qualcomm.com/laptops/products/snapdragon-x-plus" target="_blank" rel="noreferrer">Qualcomm Snapdragon X Plus specifications ↗</a>
+<a href="https://www.amd.com/en/newsroom/press-releases/2024-6-2-amd-unveils-next-gen-zen-5-ryzen-processors-to-p.html" target="_blank" rel="noreferrer">AMD Ryzen AI 300 architecture ↗</a>
+<a href="https://www.amd.com/en/technologies/xdna.html" target="_blank" rel="noreferrer">AMD XDNA architecture ↗</a>
+<a href="https://www.intel.com/content/www/us/en/support/articles/000099574/processors/intel-core-ultra-processors.html" target="_blank" rel="noreferrer">Intel Core Ultra 200V overview ↗</a>
+<a href="https://learn.microsoft.com/en-us/powershell/scripting/samples/collecting-information-about-computers" target="_blank" rel="noreferrer">Microsoft Learn: collect computer information ↗</a>
+</section>
+</main>
+<footer>GPU Flow Explorer · SoC comparison and recovery lab · Educational simulation, not telemetry or covert tracking</footer>
+<script src="update.js"></script>
+</body>
+</html>
