@@ -66,7 +66,7 @@
   renderInventory(inventory);
  });
  $("#copyInventoryCommand").addEventListener("click",()=>{
-  const command='''$cpu = (Get-CimInstance Win32_Processor | Select-Object -First 1 -ExpandProperty Name)\n$bios = Get-CimInstance Win32_BIOS\n$system = Get-CimInstance Win32_ComputerSystem\n$enclosure = Get-CimInstance Win32_SystemEnclosure\n$product = Get-CimInstance Win32_ComputerSystemProduct\n[pscustomobject]@{ Manufacturer=$system.Manufacturer; Model=$system.Model; Processor=$cpu; BIOS_Serial=$bios.SerialNumber; Enclosure_Serial=($enclosure | Select-Object -First 1 -ExpandProperty SerialNumber); Asset_Tag=($enclosure | Select-Object -First 1 -ExpandProperty SMBIOSAssetTag); UUID=$product.UUID } | Format-List\n''';
+  const command=$("#showCommand").textContent;
   if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(command).then(()=>{$("#commandFeedback").textContent="PowerShell command copied."}).catch(()=>{$("#commandFeedback").textContent="Copy unavailable; select and copy the command below."});}
   else $("#commandFeedback").textContent="Clipboard unavailable; select and copy the command below.";
  });
