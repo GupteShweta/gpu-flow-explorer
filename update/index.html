@@ -29,13 +29,21 @@
 <select id="socVendor"><option value="snapdragon">Qualcomm Snapdragon X</option><option value="amd">AMD Ryzen AI 300</option><option value="intel">Intel Core Ultra 200V</option></select>
 </label>
 <div class="architecture-summary" style="grid-column:span 2;margin:0">
-<div><span class="micro-label">SELECTED PLATFORM</span><strong id="socName">Snapdragon X Elite / X Plus</strong><p id="socArchitecture">Oryon CPU + Adreno GPU + Hexagon NPU</p></div>
+<div><span class="micro-label">SELECTED PLATFORM</span><strong id="socName">Snapdragon X Elite / X Plus</strong><p id="socArchitecture">Oryon CPU + Adreno GPU + Hexagon NPU</p>
+<div class="soc-selected-specs">
+  <div><span>CPU</span><b id="socCpu">Qualcomm Oryon CPU</b><small id="socCpuSpec">X Elite: 12 cores; X Plus varies by SKU</small></div>
+  <div><span>GPU</span><b id="socGpu">Qualcomm Adreno GPU</b><small id="socGpuSpec">Integrated graphics; SKU-dependent</small></div>
+  <div><span>NPU</span><b id="socNpu">Qualcomm Hexagon NPU</b><small id="socNpuSpec">Up to 45 TOPS on listed SKUs</small></div>
+  <div><span>MEMORY</span><b id="socMemory">LPDDR5x</b><small>Bandwidth and capacity vary by SKU</small></div>
+</div>
+</div>
 </div>
 </div>
 <div class="soc-grid" style="margin-top:18px">
 <article class="soc-card"><div class="family">QUALCOMM · ARM-BASED PC SoC</div><h3>Snapdragon X Elite / X Plus</h3><p>Integrated Oryon CPU, Adreno graphics and Hexagon AI engine.</p><dl class="soc-specs"><dt>CPU</dt><dd>Oryon; X Elite has 12 cores, X Plus varies by SKU</dd><dt>GPU</dt><dd>Adreno integrated GPU</dd><dt>NPU</dt><dd>Hexagon, up to 45 TOPS on listed SKUs</dd><dt>Memory</dt><dd>LPDDR5x; X Elite lists up to 135 GB/s</dd></dl></article>
 <article class="soc-card"><div class="family">AMD · X86 LAPTOP SoC</div><h3>Ryzen AI 300 family</h3><p>Zen 5 / Zen 5c CPU, RDNA 3.5 graphics and XDNA 2 AI engine.</p><dl class="soc-specs"><dt>CPU</dt><dd>Up to 12 cores / 24 threads in family configurations</dd><dt>GPU</dt><dd>Radeon 800M-series, RDNA 3.5</dd><dt>NPU</dt><dd>XDNA 2, up to 50 NPU TOPS</dd><dt>Memory</dt><dd>Platform and SKU dependent</dd></dl></article>
 <article class="soc-card"><div class="family">INTEL · X86 LAPTOP SoC</div><h3>Core Ultra 200V family</h3><p>Lunar Lake design with Lion Cove, Skymont, Xe2 graphics and NPU 4.</p><dl class="soc-specs"><dt>CPU</dt><dd>4 P-cores + 4 E-cores in 200V family</dd><dt>GPU</dt><dd>Xe2; up to 8 Xe-cores by SKU</dd><dt>NPU</dt><dd>AI Boost NPU 4, up to 48 TOPS</dd><dt>Memory</dt><dd>On-package LPDDR5X</dd></dl></article>
+<article class="soc-card nvidia-reference"><div class="family">NVIDIA · DISCRETE GPU REFERENCE</div><h3>GeForce RTX Laptop GPU</h3><p>A discrete graphics processor paired with a separate host CPU—not a directly equivalent all-in-one laptop SoC.</p><dl class="soc-specs"><dt>GPU</dt><dd>Architecture and CUDA core count vary by RTX generation and SKU</dd><dt>AI</dt><dd>Tensor Cores on supported RTX generations</dd><dt>Memory</dt><dd>Dedicated GDDR memory; capacity and bandwidth are model-specific</dd><dt>System</dt><dd>Works alongside the laptop CPU and system memory</dd></dl></article>
 </div>
 <div class="chip-visual">
 <div class="diagram-title">CONCEPTUAL CHIPSET BLOCK DIAGRAM <span id="socNote">Select a platform to see its architecture note.</span></div>
@@ -96,6 +104,7 @@
 <div class="recovery-results">
 <h3>Session inventory lookup</h3>
 <label>Search asset tag, serial, model or processor<input id="deviceSearch" placeholder="Search the demonstration records"></label>
+<div class="recovery-actions"><button id="exportInventory">Export inventory CSV</button></div>
 <div id="inventoryResults"></div>
 <div class="recovery-note"><b>Demo limitation:</b> records are held only in this page's JavaScript memory. They disappear when the page is reloaded and are never uploaded to a server. Replace this with an access-controlled asset database for real institutional use.</div>
 </div>
@@ -115,6 +124,7 @@
 <a href="https://www.amd.com/en/newsroom/press-releases/2024-6-2-amd-unveils-next-gen-zen-5-ryzen-processors-to-p.html" target="_blank" rel="noreferrer">AMD Ryzen AI 300 architecture ↗</a>
 <a href="https://www.amd.com/en/technologies/xdna.html" target="_blank" rel="noreferrer">AMD XDNA architecture ↗</a>
 <a href="https://www.intel.com/content/www/us/en/support/articles/000099574/processors/intel-core-ultra-processors.html" target="_blank" rel="noreferrer">Intel Core Ultra 200V overview ↗</a>
+<a href="https://developer.nvidia.com/cuda-zone" target="_blank" rel="noreferrer">NVIDIA CUDA developer documentation ↗</a>
 <a href="https://learn.microsoft.com/en-us/powershell/scripting/samples/collecting-information-about-computers" target="_blank" rel="noreferrer">Microsoft Learn: collect computer information ↗</a>
 </section>
 </main>
