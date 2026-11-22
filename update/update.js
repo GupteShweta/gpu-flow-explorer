@@ -7,12 +7,13 @@
   intel:{name:"Intel Core Ultra 200V family",cpu:"Intel Lion Cove P-cores + Skymont E-cores",gpu:"Intel Xe2 / Arc graphics",npu:"Intel AI Boost NPU 4",cpuSpec:"200V family configuration: 4 P-cores + 4 E-cores",gpuSpec:"Xe2 graphics; up to 8 Xe-cores depending on SKU",npuSpec:"Up to 48 NPU TOPS for the family",memory:"On-package LPDDR5X for this mobile platform",arch:"Lion Cove + Skymont CPU, Xe2 GPU, NPU 4",note:"200V specifications are specific to Lunar Lake mobile SKUs; do not generalise them to every Core Ultra processor."}
  };
  const vendor=$("#socVendor");
+ function setText(selector,value){const el=$(selector);if(el)el.textContent=value;}
  function renderSoc(){
   const s=socs[vendor.value];
-  $("#socName").textContent=s.name;$("#socCpu").textContent=s.cpu;$("#socGpu").textContent=s.gpu;$("#socNpu").textContent=s.npu;
-  $("#socCpuSpec").textContent=s.cpuSpec;$("#socGpuSpec").textContent=s.gpuSpec;$("#socNpuSpec").textContent=s.npuSpec;$("#socMemory").textContent=s.memory;
-  $("#socArchitecture").textContent=s.arch;$("#socNote").textContent=s.note;
-  $("#chipCpuLabel").textContent=s.cpu;$("#chipGpuLabel").textContent=s.gpu;$("#chipNpuLabel").textContent=s.npu;
+  setText("#socName",s.name);setText("#socCpu",s.cpu);setText("#socGpu",s.gpu);setText("#socNpu",s.npu);
+  setText("#socCpuSpec",s.cpuSpec);setText("#socGpuSpec",s.gpuSpec);setText("#socNpuSpec",s.npuSpec);setText("#socMemory",s.memory);
+  setText("#socArchitecture",s.arch);setText("#socNote",s.note);
+  setText("#chipCpuLabel",s.cpu);setText("#chipGpuLabel",s.gpu);setText("#chipNpuLabel",s.npu);
  }
  vendor.addEventListener("change",renderSoc);renderSoc();
  const profiles={
@@ -44,6 +45,17 @@
   target.innerHTML=items.map((r)=>'<div class="record"><b>'+esc(r.tag)+'</b> · '+esc(r.status)+'<p>Serial: '+esc(r.serial)+'<br>Model: '+esc(r.model)+'<br>Processor: '+esc(r.processor)+'</p></div>').join("");
  }
  renderInventory(inventory);
+ $("#exportInventory").addEventListener("click",()=>{
+  const fields=["Asset tag","Manufacturer serial","Processor model","PC model","Status"];
+  const quote=value=>'"'+String(value??"").replace(/"/g,'""')+'"';
+  const rows=[fields,...inventory.map(r=>[r.tag,r.serial,r.processor,r.model,r.status])];
+  const csv=rows.map(row=>row.map(quote).join(",")).join("\r\n");
+  const blob=new Blob([csv],{type:"text/csv;charset=utf-8"});
+  const url=URL.createObjectURL(blob);
+  const link=document.createElement("a");link.href=url;link.download="gpu-flow-device-inventory.csv";
+  document.body.appendChild(link);link.click();link.remove();URL.revokeObjectURL(url);
+  $("#lossFeedback").textContent="Inventory CSV exported locally. No records were uploaded.";
+ });
  $("#deviceSearch").addEventListener("input",e=>{
   const q=e.target.value.trim().toLowerCase();
   renderInventory(!q?inventory:inventory.filter(r=>[r.tag,r.serial,r.processor,r.model].join(" ").toLowerCase().includes(q)));
@@ -70,5 +82,5 @@
   if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(command).then(()=>{$("#commandFeedback").textContent="PowerShell command copied."}).catch(()=>{$("#commandFeedback").textContent="Copy unavailable; select and copy the command below."});}
   else $("#commandFeedback").textContent="Clipboard unavailable; select and copy the command below.";
  });
- $("#showCommand").textContent='$cpu = (Get-CimInstance Win32_Processor | Select-Object -First 1 -ExpandProperty Name)\n$bios = Get-CimInstance Win32_BIOS\n$system = Get-CimInstance Win32_ComputerSystem\n$enclosure = Get-CimInstance Win32_SystemEnclosure\n$product = Get-CimInstance Win32_ComputerSystemProduct\n[pscustomobject]@{ Manufacturer=$system.Manufacturer; Model=$system.Model; Processor=$cpu; BIOS_Serial=$bios.SerialNumber; Enclosure_Serial=($enclosure | Select-Object -First 1 -ExpandProperty SerialNumber); Asset_Tag=($enclosure | Select-Object -First 1 -ExpandProperty SMBIOSAssetTag); UUID=$product.UUID } | Format-List';
+ $("#showCommand").textContent='$cpu = (Get-CimInstance Win32_Processor | Select-Object -First 1 -ExpandProperty Name)\n$bios = Get-CimInstance Win32_BIOS\n$system = Get-CimInstance Win32_ComputerSystem\n$enclosure = Get-CimInstance Win32_SystemEnclosure | Select-Object -First 1\n$product = Get-CimInstance Win32_ComputerSystemProduct\n$board = Get-CimInstance Win32_BaseBoard | Select-Object -First 1\n$gpus = (Get-CimInstance Win32_VideoController | Select-Object -ExpandProperty Name) -join "; "\n[pscustomobject]@{ Manufacturer=$system.Manufacturer; Model=$system.Model; Processor=$cpu; GPU=$gpus; RAM_GB=[math]::Round($system.TotalPhysicalMemory/1GB,2); BIOS_Serial=$bios.SerialNumber; Baseboard_Serial=$board.SerialNumber; Enclosure_Serial=$enclosure.SerialNumber; Asset_Tag=$enclosure.SMBIOSAssetTag; System_UUID=$product.UUID } | Format-List';
 })();
